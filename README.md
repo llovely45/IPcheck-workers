@@ -18,7 +18,7 @@ Cloudflare 节点：直接读取 CF 边缘节点数据。
 📸 预览
 
 https://test.135345.xyz/
-🛠️ 部署指南
+
 # 直接在 Cloudflare Dashboard 部署（推荐）
 登录 Cloudflare Dashboard。
 
