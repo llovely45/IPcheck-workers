@@ -1,61 +1,47 @@
 /**
- * IP Sentinel - Pro Edition
- * 纯净增强版
+ * IP SENTINEL - CYBERPUNK EDITION
+ * 极致美化版 - 纯净中文
  */
 
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     
-    // === 配置: 优先读取环境变量，否则使用默认值 ===
+    // 配置
     const config = {
-      title: env.TITLE || "网络连接助手",
-      footer: env.FOOTER || "© 2024 Network Tools | Cloudflare Edge",
+      title: env.TITLE || "IP SENTINEL", // 建议保留英文标题更有科技感，或改为 "网络哨兵"
+      footer: env.FOOTER || "SYSTEM ONLINE // READY",
     };
 
-    // === PWA Manifest ===
+    // PWA Manifest
     if (url.pathname === "/manifest.json") {
-      const manifest = {
+      return new Response(JSON.stringify({
         "name": config.title,
-        "short_name": "NetCheck",
+        "short_name": "Sentinel",
         "start_url": "/",
         "display": "standalone",
-        "background_color": "#0f172a",
-        "theme_color": "#0f172a",
-        "icons": [
-          {
-            "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2338bdf8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3C/svg%3E",
-            "type": "image/svg+xml",
-            "sizes": "192x192"
-          }
-        ]
-      };
-      return new Response(JSON.stringify(manifest), {
-        headers: { "content-type": "application/json" }
-      });
+        "background_color": "#030712",
+        "theme_color": "#030712",
+        "icons": [{
+          "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2306b6d4' stroke-width='2'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3Ccircle cx='12' cy='11' r='3'/%3E%3C/svg%3E",
+          "type": "image/svg+xml",
+          "sizes": "192x192"
+        }]
+      }), { headers: { "content-type": "application/json" }});
     }
 
-    // === Service Worker ===
-    if (url.pathname === "/sw.js") {
-      return new Response(`
-        self.addEventListener('install', (e) => self.skipWaiting());
-        self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
-        self.addEventListener('fetch', (e) => {});
-      `, { headers: { "content-type": "application/javascript" } });
-    }
-
-    // === 获取 Cloudflare 提供的 IP 信息 ===
+    // IP 数据获取
     const cf = request.cf || {};
     const headers = request.headers;
     const clientIp = headers.get("cf-connecting-ip") || headers.get("x-forwarded-for") || "127.0.0.1";
     
     const initData = {
       ip: clientIp,
-      country: cf.country || "未知", 
-      city: cf.city || "未知城市",
+      country: cf.country || "UNK", 
+      city: cf.city || "Unknown",
       region: cf.region || "",
-      isp: cf.asOrganization || "未知运营商",
-      asn: cf.asn ? "AS" + cf.asn : "未知 ASN",
+      isp: cf.asOrganization || "ISP N/A",
+      asn: cf.asn ? "AS" + cf.asn : "N/A",
       lat: Number(cf.latitude) || 0,
       lon: Number(cf.longitude) || 0,
       colo: cf.colo || "UNK",
@@ -66,10 +52,7 @@ export default {
     };
 
     return new Response(renderHtml(initData, config), {
-      headers: {
-        'content-type': 'text/html;charset=UTF-8',
-        'Content-Security-Policy': "default-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data: *; connect-src *; img-src * data: https:; style-src * 'unsafe-inline'; font-src *;"
-      },
+      headers: { 'content-type': 'text/html;charset=UTF-8' },
     });
   },
 };
@@ -82,12 +65,10 @@ function renderHtml(initData, config) {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>${config.title}</title>
-    <meta name="theme-color" content="#0f172a" />
+    <meta name="theme-color" content="#030712" />
     <link rel="manifest" href="/manifest.json" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2338bdf8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/%3E%3C/svg%3E">
-    
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
@@ -96,30 +77,86 @@ function renderHtml(initData, config) {
       window.CF_DATA = ${JSON.stringify(initData)};
       window.SITE_CONFIG = ${JSON.stringify(config)};
       
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
-      }
-      
       tailwind.config = {
         darkMode: 'class',
         theme: {
           extend: {
-            fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+            fontFamily: { 
+              sans: ['Rajdhani', 'sans-serif'], 
+              mono: ['JetBrains Mono', 'monospace'],
+              sci: ['Orbitron', 'sans-serif']
+            },
             colors: { 
-              slate: { 850: '#151f32', 900: '#0f172a', 950: '#020617' }, 
-              neon: { cyan: '#06b6d4', green: '#10b981', purple: '#8b5cf6', red: '#f43f5e' } 
+              cyber: { 
+                base: '#030712', 
+                panel: '#0b1121',
+                cyan: '#06b6d4', 
+                blue: '#3b82f6', 
+                purple: '#8b5cf6',
+                accent: '#22d3ee'
+              } 
+            },
+            backgroundImage: {
+              'grid-pattern': "linear-gradient(to right, #1f2937 1px, transparent 1px), linear-gradient(to bottom, #1f2937 1px, transparent 1px)",
+            },
+            animation: {
+              'scan': 'scan 3s linear infinite',
+              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            },
+            keyframes: {
+              scan: {
+                '0%': { backgroundPosition: '0% 0%' },
+                '100%': { backgroundPosition: '0% 100%' },
+              }
             }
           }
         }
       }
     </script>
     <style>
-      body { background-color: #0f172a; color: #f8fafc; -webkit-tap-highlight-color: transparent; }
-      .glass { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
-      ::-webkit-scrollbar { width: 6px; }
-      ::-webkit-scrollbar-track { background: #0f172a; }
-      ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-      .map-color { filter: brightness(0.8) contrast(1.1) grayscale(0.3); }
+      body { background-color: #030712; color: #e2e8f0; overflow-x: hidden; }
+      
+      /* 自定义滚动条 */
+      ::-webkit-scrollbar { width: 4px; }
+      ::-webkit-scrollbar-track { background: #030712; }
+      ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 2px; }
+      ::-webkit-scrollbar-thumb:hover { background: #06b6d4; }
+
+      /* 背景网格 */
+      .bg-grid {
+        background-size: 40px 40px;
+        mask-image: linear-gradient(to bottom, transparent, 10%, white, 90%, transparent);
+        opacity: 0.1;
+      }
+
+      /* 科技感边框卡片 */
+      .tech-card {
+        background: rgba(11, 17, 33, 0.6);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(34, 211, 238, 0.1);
+        position: relative;
+        overflow: hidden;
+      }
+      .tech-card::before {
+        content: ''; position: absolute; top: 0; left: 0; width: 10px; height: 10px;
+        border-top: 2px solid #06b6d4; border-left: 2px solid #06b6d4;
+      }
+      .tech-card::after {
+        content: ''; position: absolute; bottom: 0; right: 0; width: 10px; height: 10px;
+        border-bottom: 2px solid #06b6d4; border-right: 2px solid #06b6d4;
+      }
+      
+      /* 地图滤镜 */
+      .map-hacker { filter: invert(1) grayscale(1) contrast(1.5) brightness(0.7) hue-rotate(180deg); }
+      
+      /* 扫描线效果 */
+      .scanline {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(to bottom, transparent 50%, rgba(6, 182, 212, 0.05) 50%);
+        background-size: 100% 4px;
+        pointer-events: none;
+        z-index: 10;
+      }
     </style>
   </head>
   <body>
@@ -129,434 +166,314 @@ function renderHtml(initData, config) {
       const { useState, useEffect, useRef } = React;
       const { createRoot } = ReactDOM;
 
-      // === 图标组件集 ===
+      // === 图标 ===
       const Icons = {
-        Shield: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
-        MapPin: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>,
-        Wifi: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>,
-        Copy: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>,
-        Check: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polyline points="20 6 9 17 4 12"/></svg>,
-        Server: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>,
-        Activity: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
-        Eye: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>,
-        EyeOff: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24M1 1l22 22"/></svg>,
-        Monitor: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>,
-        Smartphone: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>,
-        Globe: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>,
-        Alert: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>,
-        Lock: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>,
+        Cpu: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>,
+        Globe: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>,
+        Wifi: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>,
+        Shield: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+        Zap: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
+        MapPin: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>,
+        Eye: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>,
+        EyeOff: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24M1 1l22 22"/></svg>,
+        Terminal: (p) => <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
       };
 
-      // === 辅助函数 ===
-      const copyText = (text, onSuccess) => {
-        if (!text || text === "N/A" || text.includes("Fail")) return;
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(text).then(onSuccess).catch(() => {});
-        } else {
-           // 降级复制
-           const ta = document.createElement("textarea");
-           ta.value = text; ta.style.cssText = "position:fixed;left:-9999px";
-           document.body.appendChild(ta); ta.select(); document.execCommand("copy");
-           document.body.removeChild(ta); onSuccess();
-        }
-      };
+      // === 核心组件 ===
 
-      const maskIp = (ip) => {
-        if (!ip || ip.length < 5) return ip;
-        if (ip.includes(':')) { // IPv6
-             const parts = ip.split(':');
-             return parts.length > 3 ? parts.slice(0, 3).join(':') + ':****:****' : ip;
-        } else { // IPv4
-             return ip.replace(/\.\d+\.\d+$/, '.*.*');
-        }
-      };
-
-      const parseUA = (ua) => {
-        let os = '未知系统', browser = '未知浏览器';
-        if (ua.includes('Win')) os = 'Windows';
-        else if (ua.includes('Mac')) os = 'macOS';
-        else if (ua.includes('Linux')) os = 'Linux';
-        else if (ua.includes('Android')) os = 'Android';
-        else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS';
-        
-        if (ua.includes('Edg')) browser = 'Edge';
-        else if (ua.includes('Chrome')) browser = 'Chrome';
-        else if (ua.includes('Firefox')) browser = 'Firefox';
-        else if (ua.includes('Safari')) browser = 'Safari';
-        
-        return { os, browser };
-      };
-
-      // === 组件 ===
-
-      // 1. 信息小卡片
-      const InfoCard = ({ title, value, icon: Icon, subValue, color }) => (
-        <div className="glass p-4 rounded-xl flex flex-col justify-between h-full border border-slate-700/50 hover:border-slate-500 transition-colors">
-          <div className="flex justify-between items-start mb-2">
-            <div className="p-2 bg-slate-800/80 rounded-lg">
-              <Icon className={"w-5 h-5 " + color} />
+      const TechCard = ({ title, children, className = "", icon: Icon }) => (
+        <div className={\`tech-card rounded-lg p-5 flex flex-col \${className}\`}>
+          <div className="flex items-center gap-2 mb-4 border-b border-cyan-500/20 pb-2">
+            {Icon && <Icon className="w-4 h-4 text-cyan-400" />}
+            <h3 className="text-xs font-sci tracking-widest text-cyan-100/70 uppercase">{title}</h3>
+            <div className="flex-grow"></div>
+            <div className="flex gap-1">
+              <div className="w-1 h-1 bg-cyan-500 rounded-full animate-pulse"></div>
+              <div className="w-1 h-1 bg-cyan-500/50 rounded-full"></div>
             </div>
-            {subValue && <span className="text-[10px] font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-700">{subValue}</span>}
           </div>
-          <div>
-            <h3 className="text-slate-400 text-xs font-bold uppercase tracking-wider mb-1">{title}</h3>
-            <p className="text-base md:text-lg font-bold text-white font-mono tracking-tight leading-tight break-all">{value}</p>
+          <div className="relative z-10 flex-grow">
+            {children}
           </div>
         </div>
       );
 
-      // 2. 主 IP 卡片
-      const MainIpCard = ({ data, riskData }) => {
-        const [copied, setCopied] = useState(false);
-        const [isHidden, setIsHidden] = useState(false);
-        
-        // 风险评分
-        const calculateScore = () => {
-           if (!riskData) return null;
-           const { is_vpn, is_proxy, is_tor, is_datacenter, is_abuser, is_bot } = riskData;
-           let score = 100;
-           if (is_vpn) score -= 20; if (is_proxy) score -= 20; if (is_tor) score -= 40;
-           if (is_datacenter) score -= 15; if (is_abuser) score -= 30; if (is_bot) score -= 20;
-           return Math.max(0, score);
-        };
-        const score = calculateScore();
-        const scoreColor = score > 80 ? 'text-neon-green' : score > 50 ? 'text-yellow-400' : 'text-neon-red';
-        const barColor = score > 80 ? 'bg-neon-green' : score > 50 ? 'bg-yellow-400' : 'bg-neon-red';
-        
-        const hasRisk = riskData && (riskData.is_vpn || riskData.is_proxy || riskData.is_tor || riskData.is_abuser);
-
-        return (
-          <div className="glass p-0 rounded-2xl relative overflow-hidden border border-slate-700 shadow-2xl shadow-black/20 flex flex-col h-full">
-            {/* 顶部栏 */}
-            <div className="p-4 border-b border-slate-700/50 bg-slate-800/30 flex justify-between items-center z-20 relative">
-               <div className="flex items-center gap-2">
-                  <div className="bg-cyan-500/20 p-1.5 rounded text-cyan-400"><Icons.Shield className="w-5 h-5" /></div>
-                  <span className="font-bold text-slate-200 text-sm">当前连接 (Cloudflare)</span>
-               </div>
-               <div className="flex gap-2">
-                 <button onClick={() => setIsHidden(!isHidden)} className="p-1.5 hover:bg-slate-700 rounded text-slate-400 transition-colors" title={isHidden ? "显示 IP" : "隐藏 IP"}>
-                    {isHidden ? <Icons.EyeOff className="w-4 h-4" /> : <Icons.Eye className="w-4 h-4" />}
-                 </button>
-                 <button onClick={() => copyText(data.ip, () => { setCopied(true); setTimeout(() => setCopied(false), 2000); })} className="p-1.5 hover:bg-slate-700 rounded text-slate-400 transition-colors">
-                    {copied ? <Icons.Check className="w-4 h-4 text-green-400" /> : <Icons.Copy className="w-4 h-4" />}
-                 </button>
-               </div>
-            </div>
-
-            {/* 地图背景区域 */}
-            <div className="relative flex-grow min-h-[160px] md:min-h-[200px] bg-slate-900 group">
-                <iframe 
-                   src={"https://maps.google.com/maps?q=" + data.lat + "," + data.lon + "&z=6&output=embed"}
-                   className="w-full h-full object-cover opacity-60 group-hover:opacity-90 transition-opacity duration-700 map-color absolute inset-0"
-                   frameBorder="0" scrolling="no" style={{pointerEvents: 'none'}}
-                ></iframe>
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent z-10"></div>
-                
-                <div className="absolute bottom-4 left-4 right-4 z-20">
-                   <div className="text-3xl md:text-4xl font-mono font-bold text-white tracking-tight drop-shadow-lg mb-1">
-                      {isHidden ? maskIp(data.ip) : data.ip}
-                   </div>
-                   <div className="flex flex-wrap gap-2 items-center text-sm font-medium text-slate-300 drop-shadow-md">
-                      <span className="flex items-center gap-1"><Icons.MapPin className="w-4 h-4 text-cyan-400" /> {data.city} {data.region} {data.country}</span>
-                      <span className="hidden md:inline text-slate-500">|</span>
-                      <span className="flex items-center gap-1"><Icons.Server className="w-4 h-4 text-purple-400" /> {data.isp}</span>
-                   </div>
-                </div>
-            </div>
-
-            {/* 底部信息栏 */}
-            <div className="p-4 bg-slate-900/80 backdrop-blur border-t border-slate-800 z-20">
-               <div className="flex items-center gap-4">
-                  <div className="flex flex-col gap-1 min-w-[80px]">
-                     <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">IP 评分</span>
-                     <div className={"text-2xl font-mono font-bold " + scoreColor}>{score !== null ? score : "--"}</div>
-                  </div>
-                  <div className="flex-grow flex flex-col justify-center gap-2">
-                     <div className="flex justify-between text-xs text-slate-400">
-                        <span>{hasRisk ? "检测到潜在风险" : "IP 状态良好"}</span>
-                        <span>{score ? score + "/100" : "检测中..."}</span>
-                     </div>
-                     <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
-                        <div className={"h-full transition-all duration-1000 ease-out " + barColor} style={{ width: score ? score + "%" : "0%" }}></div>
-                     </div>
-                  </div>
-                  <div className="pl-4 border-l border-slate-700 hidden sm:block">
-                     <div className="text-xs text-slate-500 mb-1">代理检测</div>
-                     <div className={"font-bold text-sm " + (hasRisk ? "text-red-400" : "text-green-400")}>
-                        {hasRisk ? "Risk" : "Clean"}
-                     </div>
-                  </div>
-               </div>
-            </div>
+      const DataField = ({ label, value, highlight = false, sub }) => (
+        <div className="flex flex-col">
+          <span className="text-[10px] text-slate-500 uppercase tracking-wider font-mono mb-0.5">{label}</span>
+          <div className="flex items-baseline gap-2">
+            <span className={\`font-mono text-base md:text-lg truncate \${highlight ? 'text-cyan-300 font-bold drop-shadow-[0_0_5px_rgba(34,211,238,0.5)]' : 'text-slate-200'}\`}>
+              {value}
+            </span>
+            {sub && <span className="text-[10px] text-slate-500 font-mono border border-slate-700 px-1 rounded">{sub}</span>}
           </div>
-        );
-      };
+        </div>
+      );
 
-      // 3. 详细连接信息 (IPv4/IPv6)
-      const DetailedIpCard = ({ type, url }) => {
-         const [info, setInfo] = useState(null);
-         const [loading, setLoading] = useState(true);
-         
-         useEffect(() => {
-            const fetchInfo = async () => {
-               try {
-                  const res = await fetch(url);
-                  const data = await res.json();
-                  setInfo(data);
-               } catch(e) { setInfo({ error: true }); }
-               finally { setLoading(false); }
-            };
-            fetchInfo();
-         }, [url]);
-
-         const isAvailable = info && !info.error && info.ip;
-
-         return (
-            <div className="glass p-4 rounded-xl border border-slate-700/50 flex flex-col gap-3">
-               <div className="flex justify-between items-center pb-2 border-b border-slate-700/50">
-                  <span className="font-bold text-slate-300 flex items-center gap-2">
-                     {type === 'IPv4' ? <span className="bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded text-xs">IPv4</span> : <span className="bg-green-500/20 text-green-400 px-2 py-0.5 rounded text-xs">IPv6</span>}
-                     连接测试
-                  </span>
-                  {loading && <div className="w-3 h-3 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>}
-               </div>
-               
-               {loading ? (
-                  <div className="h-20 flex items-center justify-center text-slate-600 text-sm">正在检测...</div>
-               ) : isAvailable ? (
-                  <div className="space-y-2 text-sm">
-                     <div className="flex justify-between">
-                        <span className="text-slate-500">地址</span>
-                        <span className="text-slate-200 font-mono select-all text-right truncate ml-4" title={info.ip}>{maskIp(info.ip)}</span>
-                     </div>
-                     <div className="flex justify-between">
-                        <span className="text-slate-500">运营商</span>
-                        <span className="text-slate-300 text-right truncate ml-4" title={info.isp}>{info.isp}</span>
-                     </div>
-                     <div className="flex justify-between">
-                        <span className="text-slate-500">位置</span>
-                        <span className="text-slate-300 text-right truncate ml-4">{info.country} {info.city}</span>
-                     </div>
-                     <div className="flex justify-between">
-                        <span className="text-slate-500">ASN</span>
-                        <span className="text-slate-300 font-mono text-right">{info.asn ? "AS"+info.asn : "-"}</span>
-                     </div>
-                  </div>
-               ) : (
-                  <div className="h-24 flex flex-col items-center justify-center text-slate-500 gap-2">
-                     <Icons.Alert className="w-6 h-6 opacity-50" />
-                     <span className="text-xs">该网络环境不支持 {type}</span>
-                  </div>
-               )}
-            </div>
-         );
-      };
-
-      // 4. WebRTC 检测
-      const WebRTCDetect = () => {
-         const [status, setStatus] = useState("检测中...");
-         const [leakIp, setLeakIp] = useState(null);
-         
-         useEffect(() => {
-            const rtc = new RTCPeerConnection({iceServers: [{urls: "stun:stun.l.google.com:19302"}]});
-            rtc.createDataChannel('');
-            rtc.createOffer().then(o => rtc.setLocalDescription(o));
-            rtc.onicecandidate = (ice) => {
-               if (ice && ice.candidate && ice.candidate.candidate) {
-                  const ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/;
-                  const res = ipRegex.exec(ice.candidate.candidate);
-                  if (res && res[1]) {
-                     if (!res[1].startsWith('192.168') && !res[1].startsWith('10.') && !res[1].startsWith('172.')) {
-                        setLeakIp(res[1]); setStatus("存在泄漏");
-                     }
-                  }
-               }
-            };
-            setTimeout(() => {
-               if (!leakIp) setStatus("安全 (无泄漏)");
-               rtc.close();
-            }, 3000);
-         }, [leakIp]);
-
-         return (
-            <div className="glass p-4 rounded-xl border border-slate-700/50 flex flex-col justify-between h-full">
-               <div className="flex items-center gap-2 mb-2">
-                  <Icons.Lock className={"w-5 h-5 " + (leakIp ? "text-red-400" : "text-emerald-400")} />
-                  <span className="font-bold text-slate-300">WebRTC 隐私</span>
-               </div>
-               <div>
-                  <div className={"text-lg font-bold " + (leakIp ? "text-red-400" : "text-emerald-400")}>{status}</div>
-                  {leakIp && <div className="text-xs text-slate-500 mt-1 font-mono">暴露 IP: {leakIp}</div>}
-               </div>
-            </div>
-         );
-      };
-
-      // 5. 延迟测试条目
-      const LatencyItem = ({ name, url }) => {
-         const [ms, setMs] = useState(null);
-         const [status, setStatus] = useState('checking');
-         
-         useEffect(() => {
-            const start = performance.now();
-            let isDone = false;
-            const controller = new AbortController();
-            
-            const runCheck = async () => {
-               try {
-                  await fetch(url, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
-                  if(!isDone) { isDone = true; setMs(Math.round(performance.now() - start)); setStatus('ok'); }
-               } catch(e) { if(!isDone) { isDone = true; setStatus('fail'); } }
-            };
-            
-            runCheck();
-            setTimeout(() => { if(!isDone) { isDone = true; controller.abort(); setStatus('timeout'); } }, 3000);
-         }, []);
-
-         const color = status === 'ok' ? (ms < 100 ? 'text-green-400' : ms < 300 ? 'text-yellow-400' : 'text-orange-400') : 'text-slate-500';
-         
-         return (
-            <div className="flex items-center justify-between p-2.5 bg-slate-800/40 rounded border border-slate-800">
-               <span className="text-sm text-slate-300 font-medium">{name}</span>
-               <span className={"font-mono text-xs font-bold " + color}>
-                  {status === 'checking' ? '...' : status === 'ok' ? ms + 'ms' : '超时'}
-               </span>
-            </div>
-         );
-      };
-
-      // 6. 网络连接信息 (Hardware/Connection API)
-      const NetworkInfo = () => {
-          const [netInfo, setNetInfo] = useState({ type: '未知', speed: '未知', rtt: '未知' });
-          
-          useEffect(() => {
-             if (navigator.connection) {
-                const updateNet = () => {
-                   const c = navigator.connection;
-                   setNetInfo({
-                      type: c.effectiveType ? c.effectiveType.toUpperCase() : 'WIFI/LAN',
-                      speed: c.downlink ? c.downlink + ' Mbps' : '未知',
-                      rtt: c.rtt ? c.rtt + ' ms' : '未知'
-                   });
-                };
-                updateNet();
-                navigator.connection.addEventListener('change', updateNet);
-                return () => navigator.connection.removeEventListener('change', updateNet);
-             }
-          }, []);
-          
-          return (
-             <div className="grid grid-cols-3 gap-2 mt-4">
-                <div className="bg-slate-800/50 rounded p-2 text-center border border-slate-700">
-                   <div className="text-[10px] text-slate-500 uppercase">网络类型</div>
-                   <div className="text-cyan-400 font-bold font-mono text-sm">{netInfo.type}</div>
-                </div>
-                <div className="bg-slate-800/50 rounded p-2 text-center border border-slate-700">
-                   <div className="text-[10px] text-slate-500 uppercase">下行带宽</div>
-                   <div className="text-emerald-400 font-bold font-mono text-sm">{netInfo.speed}</div>
-                </div>
-                <div className="bg-slate-800/50 rounded p-2 text-center border border-slate-700">
-                   <div className="text-[10px] text-slate-500 uppercase">估算延迟</div>
-                   <div className="text-yellow-400 font-bold font-mono text-sm">{netInfo.rtt}</div>
-                </div>
-             </div>
-          );
-      };
-
-      // === 主程序 ===
-      const App = () => {
-        const data = window.CF_DATA;
-        const [riskData, setRiskData] = useState(null);
-        const [hostname, setHostname] = useState("扫描中...");
-        const sysInfo = parseUA(data.userAgent);
+      // 系统初始化动画
+      const BootScreen = ({ onComplete }) => {
+        const [lines, setLines] = useState([]);
         
-        // 屏幕信息
-        const screenInfo = window.screen ? \`\${window.screen.width}x\${window.screen.height}\` : "未知";
-
         useEffect(() => {
-           // 获取 IP 风险数据
-           fetch('https://api.ipapi.is').then(res => res.json()).then(json => {
-              setRiskData(json);
-              setHostname(json.asn?.domain || json.company?.domain || "N/A");
-           }).catch(() => setHostname("无法获取"));
+          const logs = [
+            "INITIALIZING KERNEL...",
+            "LOADING NETWORK MODULES...",
+            "ESTABLISHING SECURE CONNECTION...",
+            "ANALYZING LATENCY...",
+            "SYSTEM READY."
+          ];
+          let delay = 0;
+          logs.forEach((log, i) => {
+            delay += Math.random() * 300 + 100;
+            setTimeout(() => setLines(prev => [...prev, log]), delay);
+          });
+          setTimeout(onComplete, delay + 500);
         }, []);
 
         return (
-          <div className="min-h-screen max-w-6xl mx-auto px-4 py-8 pb-20">
-             {/* 标题头 */}
-             <header className="mb-8 flex items-center justify-between">
-                <div>
-                   <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-                      <Icons.Activity className="w-6 h-6 text-cyan-400" />
-                      {window.SITE_CONFIG.title}
-                   </h1>
-                   <p className="text-slate-500 text-sm mt-1">Cloudflare Edge 实时网络分析</p>
-                </div>
-                <div className="text-right hidden sm:block">
-                   <div className="text-xs font-mono text-slate-600 border border-slate-800 rounded px-2 py-1">
-                      {data.tlsVersion} / {data.httpProtocol}
-                   </div>
-                </div>
-             </header>
-
-             {/* 第一行：主要 IP 信息 和 设备信息 */}
-             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                <div className="lg:col-span-2 h-full">
-                   <MainIpCard data={data} riskData={riskData} />
-                </div>
-                <div className="grid grid-cols-2 gap-4 h-full">
-                   <InfoCard title="系统环境" value={sysInfo.os} subValue={sysInfo.browser} icon={Icons.Monitor} color="text-blue-400" />
-                   <InfoCard title="屏幕分辨率" value={screenInfo} subValue={window.screen.colorDepth + " bit"} icon={Icons.Smartphone} color="text-purple-400" />
-                   <InfoCard title="数据中心" value={data.colo} icon={Icons.Server} color="text-orange-400" />
-                   <InfoCard title="网络主机名" value={hostname} icon={Icons.Wifi} color="text-pink-400" />
-                </div>
+          <div className="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center font-mono text-green-500 text-xs md:text-sm p-4">
+             <div className="w-full max-w-md">
+               {lines.map((l, i) => <div key={i} className="mb-1">> {l}</div>)}
+               <div className="animate-pulse mt-2">_</div>
              </div>
-
-             {/* 第二行：连通性测试 (双栈 + 网站) */}
-             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                <DetailedIpCard type="IPv4" url="https://api-ipv4.ip.sb/geoip" />
-                <DetailedIpCard type="IPv6" url="https://api-ipv6.ip.sb/geoip" />
-                
-                <div className="glass p-4 rounded-xl border border-slate-700/50 lg:col-span-2 flex flex-col">
-                   <div className="flex items-center gap-2 mb-4 pb-2 border-b border-slate-700/50">
-                      <Icons.Globe className="w-5 h-5 text-indigo-400" />
-                      <span className="font-bold text-slate-300">服务连通性与延迟</span>
-                   </div>
-                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                      <LatencyItem name="百度" url="https://www.baidu.com" />
-                      <LatencyItem name="淘宝" url="https://www.taobao.com" />
-                      <LatencyItem name="微信" url="https://mp.weixin.qq.com" />
-                      <LatencyItem name="Google" url="https://www.google.com" />
-                      <LatencyItem name="GitHub" url="https://github.com" />
-                      <LatencyItem name="Cloudflare" url="https://www.cloudflare.com" />
-                   </div>
-                   <NetworkInfo />
-                </div>
-             </div>
-             
-             {/* 第三行：WebRTC 与 其他工具 */}
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <WebRTCDetect />
-                <div className="glass p-4 rounded-xl border border-slate-700/50 flex flex-col justify-center items-center text-center">
-                   <div className="text-slate-500 text-xs uppercase mb-1">当前时区时间</div>
-                   <div className="text-2xl font-mono font-bold text-white">
-                      {new Date().toLocaleTimeString('zh-CN', { timeZone: data.timezone })}
-                   </div>
-                   <div className="text-xs text-slate-500 mt-1">{data.timezone}</div>
-                </div>
-                 <div className="glass p-4 rounded-xl border border-slate-700/50 flex flex-col justify-center items-center text-center">
-                   <div className="text-slate-500 text-xs uppercase mb-1">客户端 UA</div>
-                   <div className="text-xs font-mono text-slate-400 break-all line-clamp-3">
-                      {data.userAgent}
-                   </div>
-                </div>
-             </div>
-
-             <footer className="mt-16 text-center border-t border-slate-800 pt-8">
-                <p className="text-slate-600 text-sm font-medium">{window.SITE_CONFIG.footer}</p>
-             </footer>
           </div>
         );
+      };
+
+      const MainDashboard = ({ data, riskData }) => {
+        const [isHidden, setIsHidden] = useState(false);
+        const [score, setScore] = useState(0);
+
+        useEffect(() => {
+           if(riskData) {
+             let s = 100;
+             if(riskData.is_vpn) s-=20; if(riskData.is_proxy) s-=20; if(riskData.is_datacenter) s-=20;
+             setScore(s);
+           }
+        }, [riskData]);
+
+        const mask = (ip) => ip.replace(/\d+\.\d+$/, '***.***').replace(/:[\da-f]+:[\da-f]+$/, ':****:****');
+
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* 左侧核心状态 - 占据大图 */}
+            <div className="lg:col-span-8 relative group">
+               <div className="absolute inset-0 bg-cyan-500/5 blur-[100px] rounded-full opacity-20 pointer-events-none"></div>
+               
+               <div className="tech-card rounded-xl border-cyan-500/30 h-full min-h-[300px] flex flex-col relative overflow-hidden">
+                  <div className="scanline"></div>
+                  
+                  {/* 背景地图 */}
+                  <div className="absolute inset-0 opacity-40 mix-blend-screen">
+                     <iframe 
+                        src={\`https://maps.google.com/maps?q=\${data.lat},\${data.lon}&z=5&output=embed\`}
+                        className="w-full h-full object-cover map-hacker"
+                        style={{pointerEvents: 'none'}}
+                     ></iframe>
+                     <div className="absolute inset-0 bg-gradient-to-t from-[#0b1121] via-transparent to-transparent"></div>
+                  </div>
+
+                  {/* 核心内容浮层 */}
+                  <div className="relative z-20 flex flex-col h-full justify-between p-2">
+                     <div className="flex justify-between items-start">
+                        <div className="flex items-center gap-2 bg-black/40 backdrop-blur px-3 py-1 rounded border border-cyan-500/30">
+                           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                           <span className="text-xs font-sci text-cyan-400">ONLINE</span>
+                        </div>
+                        <button onClick={() => setIsHidden(!isHidden)} className="p-2 hover:bg-cyan-900/30 rounded text-cyan-400 transition-colors">
+                           {isHidden ? <Icons.EyeOff className="w-5 h-5"/> : <Icons.Eye className="w-5 h-5"/>}
+                        </button>
+                     </div>
+
+                     <div className="mt-auto">
+                        <div className="text-[10px] text-cyan-500 font-mono tracking-[0.2em] mb-1 opacity-70">CURRENT CONNECTION</div>
+                        <h1 className="text-4xl md:text-6xl font-mono font-bold text-white tracking-tighter drop-shadow-2xl mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-cyan-300">
+                           {isHidden ? mask(data.ip) : data.ip}
+                        </h1>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-black/60 backdrop-blur-md p-4 rounded-lg border border-white/5">
+                           <DataField label="LOCATION" value={data.country} sub={data.region} />
+                           <DataField label="NETWORK" value={data.isp} highlight />
+                           <DataField label="ASN" value={data.asn} />
+                           <DataField label="COORDINATES" value={\`\${data.lat.toFixed(2)}, \${data.lon.toFixed(2)}\`} />
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+
+            {/* 右侧数据面板 */}
+            <div className="lg:col-span-4 flex flex-col gap-4">
+               {/* 风险评分环 */}
+               <TechCard title="THREAT ANALYSIS" icon={Icons.Shield} className="flex-1">
+                  <div className="flex items-center justify-between h-full">
+                     <div className="relative w-24 h-24 flex items-center justify-center">
+                        <svg className="w-full h-full transform -rotate-90">
+                           <circle cx="48" cy="48" r="40" stroke="#1e293b" strokeWidth="8" fill="none"/>
+                           <circle cx="48" cy="48" r="40" stroke={score > 80 ? "#10b981" : "#f59e0b"} strokeWidth="8" fill="none" strokeDasharray="251.2" strokeDashoffset={251.2 * (1 - score/100)} className="transition-all duration-1000"/>
+                        </svg>
+                        <span className="absolute text-xl font-bold font-mono">{score}</span>
+                     </div>
+                     <div className="flex flex-col gap-2 text-right">
+                        <div className="text-xs text-slate-400">RISK LEVEL</div>
+                        <div className={\`text-lg font-bold \${score > 80 ? 'text-green-400' : 'text-yellow-400'}\`}>
+                           {score > 80 ? 'SECURE' : 'CAUTION'}
+                        </div>
+                        <div className="text-[10px] text-slate-500 font-mono">
+                           PROXY: {riskData?.is_proxy ? 'YES' : 'NO'} <br/>
+                           VPN: {riskData?.is_vpn ? 'YES' : 'NO'}
+                        </div>
+                     </div>
+                  </div>
+               </TechCard>
+
+               {/* 环境信息 */}
+               <TechCard title="SYSTEM ENV" icon={Icons.Terminal} className="flex-1">
+                   <div className="space-y-3">
+                      <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                         <span className="text-xs text-slate-400">PROTOCOL</span>
+                         <span className="text-xs font-mono text-cyan-300">{data.httpProtocol} / {data.tlsVersion}</span>
+                      </div>
+                      <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                         <span className="text-xs text-slate-400">DATA CENTER</span>
+                         <span className="text-xs font-mono text-purple-300">{data.colo}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                         <span className="text-xs text-slate-400">TIMEZONE</span>
+                         <span className="text-xs font-mono text-slate-200">{data.timezone}</span>
+                      </div>
+                   </div>
+               </TechCard>
+            </div>
+          </div>
+        );
+      };
+
+      const PingGrid = () => {
+         const targets = [
+            { name: "Google", url: "https://www.google.com" },
+            { name: "GitHub", url: "https://github.com" },
+            { name: "Cloudflare", url: "https://www.cloudflare.com" },
+            { name: "Baidu", url: "https://www.baidu.com" },
+         ];
+
+         return (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+               {targets.map(t => <PingItem key={t.name} target={t} />)}
+            </div>
+         );
+      };
+
+      const PingItem = ({ target }) => {
+         const [ms, setMs] = useState(null);
+         const [loading, setLoading] = useState(true);
+
+         useEffect(() => {
+            const start = performance.now();
+            fetch(target.url, { mode: 'no-cors' }).then(() => {
+               setMs(Math.round(performance.now() - start));
+               setLoading(false);
+            }).catch(() => setLoading(false));
+         }, []);
+
+         return (
+            <div className="bg-[#0b1121]/50 border border-slate-800 p-3 rounded flex flex-col items-center justify-center relative overflow-hidden group hover:border-cyan-500/30 transition-colors">
+               <div className="text-[10px] text-slate-500 uppercase mb-1 z-10">{target.name}</div>
+               <div className="text-xl font-mono font-bold z-10 flex items-center gap-1">
+                  {loading ? <span className="animate-pulse text-slate-600">--</span> : 
+                   <span className={ms < 200 ? "text-green-400" : "text-yellow-400"}>{ms}</span>}
+                  <span className="text-[10px] text-slate-600">ms</span>
+               </div>
+               {/* 底部进度条装饰 */}
+               <div className="absolute bottom-0 left-0 h-0.5 bg-cyan-500 transition-all duration-1000" style={{width: loading ? '0%' : '100%'}}></div>
+            </div>
+         );
+      };
+
+      const App = () => {
+        const [booted, setBooted] = useState(false);
+        const [riskData, setRiskData] = useState(null);
+        
+        useEffect(() => {
+           fetch('https://api.ipapi.is').then(r => r.json()).then(setRiskData).catch(()=>{});
+        }, []);
+
+        if (!booted) return <BootScreen onComplete={() => setBooted(true)} />;
+
+        return (
+          <div className="min-h-screen bg-cyber-base bg-grid text-slate-300 font-sans selection:bg-cyan-500/30">
+            
+            {/* 顶部导航 */}
+            <nav className="border-b border-white/5 bg-black/20 backdrop-blur-md sticky top-0 z-40">
+               <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                     <div className="w-8 h-8 bg-cyan-500/10 border border-cyan-500/50 rounded flex items-center justify-center">
+                        <Icons.Cpu className="w-5 h-5 text-cyan-400" />
+                     </div>
+                     <span className="font-sci font-bold text-xl text-white tracking-widest">
+                        IP<span className="text-cyan-400">SENTINEL</span>
+                     </span>
+                  </div>
+                  <div className="text-xs font-mono text-cyan-500/50 hidden md:block">
+                     SYSTEM STATUS: NORMAL // {new Date().toLocaleTimeString()}
+                  </div>
+               </div>
+            </nav>
+
+            <main className="max-w-7xl mx-auto px-4 py-8 relative">
+               {/* 装饰光效 */}
+               <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-[128px] pointer-events-none"></div>
+
+               <MainDashboard data={window.CF_DATA} riskData={riskData} />
+               
+               <div className="mt-8">
+                  <h3 className="flex items-center gap-2 text-sm font-sci text-cyan-100/70 mb-4">
+                     <Icons.Zap className="w-4 h-4 text-yellow-400" /> 
+                     NETWORK LATENCY
+                  </h3>
+                  <PingGrid />
+               </div>
+
+               <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <TechCard title="IPv4 CONNECTIVITY" icon={Icons.Globe}>
+                     <ConnectivityCheck type="IPv4" url="https://api-ipv4.ip.sb/geoip" />
+                  </TechCard>
+                  <TechCard title="IPv6 CONNECTIVITY" icon={Icons.Globe}>
+                     <ConnectivityCheck type="IPv6" url="https://api-ipv6.ip.sb/geoip" />
+                  </TechCard>
+               </div>
+            </main>
+
+            <footer className="border-t border-white/5 mt-12 py-8 text-center">
+               <div className="text-[10px] text-slate-600 font-mono uppercase tracking-widest">
+                  {window.SITE_CONFIG.footer}
+               </div>
+            </footer>
+          </div>
+        );
+      };
+
+      const ConnectivityCheck = ({ url }) => {
+         const [data, setData] = useState(null);
+         useEffect(() => {
+            fetch(url).then(r=>r.json()).then(setData).catch(()=>setData({error:true}));
+         }, [url]);
+
+         if(!data) return <div className="h-16 flex items-center text-xs text-slate-500 font-mono animate-pulse">> PINGING GATEWAY...</div>;
+         if(data.error) return <div className="h-16 flex items-center text-xs text-red-500 font-mono">> CONNECTION FAILED</div>;
+
+         return (
+            <div className="flex flex-col gap-1 mt-2">
+               <div className="flex justify-between">
+                  <span className="text-slate-500 text-xs font-mono">ADDR</span>
+                  <span className="text-cyan-300 text-xs font-mono truncate ml-4">{data.ip}</span>
+               </div>
+               <div className="flex justify-between">
+                  <span className="text-slate-500 text-xs font-mono">ISP</span>
+                  <span className="text-slate-300 text-xs font-mono truncate">{data.isp}</span>
+               </div>
+            </div>
+         );
       };
 
       const root = createRoot(document.getElementById('root'));
