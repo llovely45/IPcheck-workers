@@ -515,7 +515,7 @@ const DualStackCard = ({ type, color }) => {
     const label = type === 'v4' ? 'IPv4 Connectivity' : 'IPv6 Connectivity';
 
     return (
-        <div className={`glass-card border-l-[3px] ${borderColor} rounded-r-xl p-4 flex items-center justify-between relative overflow-hidden group`}>
+        <div className={`glass-card border-l-[3px] ${borderColor} rounded-xl p-4 flex items-center justify-between relative overflow-hidden group`}>
             <div className="z-10">
                 <div className="text-[10px] text-gray-400 dark:text-slate-500 font-bold uppercase tracking-wider mb-1">{label}</div>
                 <div className="font-mono font-bold text-gray-800 dark:text-slate-100 text-sm break-all transition-colors">
@@ -585,7 +585,7 @@ const App = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                 <IpCard title="国内出口" type="domestic" delay={300} accent="blue" />
                 <IpCard title="国外出口" type="foreign" delay={400} accent="amber" />
-                <IpCard title="Cloudflare" type="cloudflare" delay={500} accent="primary" cfIp={cfData.ip} />
+                <IpCard title="Cloudflare" type="cloudflare" delay={500} accent="orange" cfIp={cfData.ip} />
             </div>
 
             <Fingerprint />
