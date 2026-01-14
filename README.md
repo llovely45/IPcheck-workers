@@ -17,7 +17,7 @@ Cloudflare 节点：直接读取 CF 边缘节点数据。
 🚀 开箱即用：单文件架构，无需 npm install，直接粘贴到 Cloudflare Worker 编辑器即可运行。
 
 📸 预览
-[截图](https://dry-haze-729e.gray-eee.workers.dev/)
+https://dry-haze-729e.gray-eee.workers.dev
 
 🛠️ 部署指南
 # 方法一：直接在 Cloudflare Dashboard 部署（推荐）
