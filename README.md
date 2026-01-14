@@ -8,12 +8,6 @@ IPcheck 是一个基于 Cloudflare Workers 的轻量级、高性能 IP 工具箱
 
 ⚡ 实时延迟测速：内置 Bilibili, Google, GitHub, OpenAI 等 10+ 常用服务的延迟检测，配备 Sparkline 实时波形图展示网络波动。
 
-🌍 三级容错定位：
-
-国内出口：优先使用 ipip.net，故障自动切换至 useragentinfo，最后兜底 ipapi.co。
-
-国外出口：直连 ipapi.co。
-
 Cloudflare 节点：直接读取 CF 边缘节点数据。
 
 🔁 双栈检测：同时检测 IPv4 和 IPv6 连接能力，科技感 UI 展示。
@@ -23,10 +17,10 @@ Cloudflare 节点：直接读取 CF 边缘节点数据。
 🚀 开箱即用：单文件架构，无需 npm install，直接粘贴到 Cloudflare Worker 编辑器即可运行。
 
 📸 预览
-在此处添加您的项目截图
+[截图](https://dry-haze-729e.gray-eee.workers.dev/)
 
 🛠️ 部署指南
-方法一：直接在 Cloudflare Dashboard 部署（推荐）
+# 方法一：直接在 Cloudflare Dashboard 部署（推荐）
 登录 Cloudflare Dashboard。
 
 进入 Workers & Pages -> Create Application -> Create Worker。
@@ -41,7 +35,7 @@ Cloudflare 节点：直接读取 CF 边缘节点数据。
 
 访问分配给您的 Worker 域名即可使用！
 
-方法二：使用 Wrangler CLI
+# 方法二：使用 Wrangler CLI
 如果您习惯本地开发：
 
 初始化项目：
@@ -49,7 +43,7 @@ Cloudflare 节点：直接读取 CF 边缘节点数据。
 code
 Bash
 npm create cloudflare@latest ipcheck
-# 选择 "Hello World" Worker
+选择 "Hello World" Worker
 将代码复制到 src/index.js (或 src/index.ts)。
 
 发布：
